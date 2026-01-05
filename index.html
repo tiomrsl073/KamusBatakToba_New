@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kamus Bahasa Batak Toba | Gorga Nusantara</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <style>
+:root {
+    --batak-red: #8B0000;
+    --batak-dark: #2C1810;
+    --batak-gold: #D4A017;
+    --batak-cream: #FDF6E3;
+    --batak-purple: #4A148C;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to bottom, #f9f3e8, #fdf6e3);
+    color: #2C1810;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  
+  /* GORGA BACKGROUND */
+  .gorga-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><path fill="%23D4A017" opacity="0.08" d="M60 10 L70 30 L90 30 L75 45 L85 65 L60 50 L35 65 L45 45 L30 30 L50 30 Z"/><path fill="%23D4A017" opacity="0.08" d="M20 50 L30 70 L50 70 L35 85 L45 105 L20 90 L0 105 L10 85 L0 70 L15 70 Z" transform="translate(80,0)"/></svg>') repeat;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  header {
+    background: linear-gradient(135deg, var(--batak-red), var(--batak-purple));
+    color: white;
+    text-align: center;
+    padding: 3rem 1rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(139, 0, 0, 0.3);
+  }
+  
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60"><path fill="none" stroke="%23D4A017" stroke-width="3" opacity="0.3" d="M0,30 Q50,10 100,30 T200,30"/></svg>') center/100% 100% no-repeat;
+    pointer-events: none;
+  }
+  
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+  }
+  
+  header p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .container {
+    max-width: 1100px;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+  }
+  
+  /* CARD BAHASA */
+  .language-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+  
+  .lang-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid transparent;
+  }
+  
+  .lang-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 8px;
+    background: linear-gradient(90deg, var(--batak-gold), var(--batak-red), var(--batak-gold));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .lang-card:hover::before { opacity: 1; }
+  .lang-card:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 20px 40px rgba(139, 0, 0, 0.2);
+    border-color: var(--batak-gold);
+  }
+  
+  .lang-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+  
+  .lang-card h2 {
+    font-family: 'Cinzel', serif;
+    color: var(--batak-red);
+    margin: 0.8rem 0;
+    font-size: 1.6rem;
+  }
+  
+  .lang-card p {
+    color: #555;
+    font-size: 0.95rem;
+  }
+  
+  /* DICTIONARY PAGE */
+  .dictionary-page {
+    display: none;
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+  }
+  
+  .back-btn {
+    background: var(--batak-dark);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s;
+    margin-bottom: 1.5rem;
+  }
+  
+  .back-btn:hover {
+    background: #000;
+    transform: translateX(-5px);
+  }
+  
+  .search-box {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    border: 2px solid #ddd;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s;
+    background: #fdf6e3;
+  }
+  
+  .search-box:focus {
+    outline: none;
+    border-color: var(--batak-red);
+    box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.15);
+    background: white;
+  }
+  
+  .alphabet-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.8rem;
+    justify-content: center;
+    padding: 0.5rem;
+    background: #f8f0e0;
+    border-radius: 16px;
+  }
+  
+  .alpha-btn {
+    padding: 0.6rem 1rem;
+    border: 2px solid var(--batak-red);
+    background: transparent;
+    color: var(--batak-red);
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .alpha-btn.active,
+  .alpha-btn:hover {
+    background: var(--batak-red);
+    color: white;
+    transform: scale(1.05);
+  }
+  
+  .word-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .word-card {
+    background: linear-gradient(135deg, #fff, #fdf6e3);
+    border-radius: 16px;
+    padding: 1.4rem;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--batak-gold);
+  }
+  
+  .word-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    border-left-color: var(--batak-red);
+  }
+  
+  .word-batak {
+    color: var(--batak-red);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .word-meaning {
+    font-weight: 600;
+    color: var(--batak-dark);
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
+  }
+  
+  .word-type {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  
+  .no-words {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: #888;
+    font-style: italic;
+    background: #fdf6e3;
+    border-radius: 16px;
+    border: 2px dashed #ccc;
+  }
+  
+  .search-result {
+    background: linear-gradient(135deg, #fff8e1, #fdf6e3);
+    border-left: 5px solid var(--batak-gold);
+    padding: 1.2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 12px 12px 0;
+    font-size: 1.15rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  footer {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--batak-dark);
+    color: #ccc;
+    font-size: 0.95rem;
+    margin-top: 4rem;
+  }
+  
+  @media (max-width: 768px) {
+    header h1 { font-size: 2.2rem; }
+    .language-grid { grid-template-columns: 1fr; }
+    .word-grid { grid-template-columns: 1fr; }
+    .word-batak { font-size: 1.1rem; }
+  }
+  </style>
+</head>
+<body>
+
+  <div class="gorga-bg"></div>
+
+  <header>
+    <h1>Kamus Bahasa Batak Toba</h1>
+    <p>Warisan budaya dalam genggaman — Toba</p>
+  </header>
+
+  <div class="container">
+
+    <!-- PILIHAN BAHASA -->
+    <section id="languageSelection">
+      <div class="language-grid">
+        <div class="lang-card" onclick="showDictionary('toba')">
+          <svg class="lang-icon" viewBox="0 0 100 100" fill="none" stroke="#8B0000" stroke-width="3">
+            <path d="M50 15 L60 35 L80 35 L65 50 L75 70 L50 55 L25 70 L35 50 L20 35 L40 35 Z"/>
+            <circle cx="50" cy="45" r="8" fill="#D4A017"/>
+          </svg>
+          <h2>Batak Toba</h2>
+          <p>Kamus Indonesia → Batak Toba</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- KAMUS TOBA -->
+    <section id="dictionaryToba" class="dictionary-page">
+      <button class="back-btn" onclick="goBack()">Back</button>
+      <h2 style="text-align:center; margin:1.5rem 0; color:var(--batak-red); font-family:'Cinzel',serif;">
+        Kamus Batak Toba
+      </h2>
+      <input type="text" class="search-box" id="searchToba" placeholder="Cari kata dalam Bahasa Indonesia..." onkeyup="searchWord('toba')">
+      <div id="searchResultToba"></div>
+      <div class="alphabet-filter" id="alphaToba"></div>
+      <div class="word-grid" id="wordListToba"></div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>© 2025 <strong>Kamus Bahasa Batak Toba</strong> | Melestarikan Warisan Budaya Nusantara</p>
+    <p>Dibuat dengan cinta <span style="color:#e74c3c;">Love</span> untuk generasi Batak</p>
+  </footer>
+
+  <!-- Load Data & Script -->
+  <script>
+const dictionaries = {
+  toba: {
+    // === HURUF A ===
+    
+    "Abara": "Bahu / pundak : Kata Benda / Nomina, karena menyatakan bagian tubuh",
+    "Abit": "Kain / pakaian : Kata Benda / Nomina, karena menyatakan benda",
+    "Adong": "ada : Kata kerja (verba) karena menyatakan keberadaan atau ekstensi",
+    "Aek": "Air : Kata Benda / Nomina, karena menyatakan benda",
+    "Aha": "apa : Kata tanya atau interogatif",
+    "Ahu / Au": "Aku : Kata Ganti / Pronomina, karena menggantikan orang pertama",
+    "Ala": "Bahwa : Kata Penghubung / Konjungsi, karena memperkenalkan isi pernyataan",
+    "Alai": "Tetapi : Kata Penghubung / Konjungsi, karena menghubungkan dua klausa yang berlawanan",
+    "Alani": "Karena : Kata Penghubung / Konjungsi, karena menyatakan sebab",
+    "Alap": "Jemput / mengambil : Kata Kerja / Verba, karena menyatakan tindakan",
+    "Alogo": "Angin : Kata Benda / Nomina, karena menyatakan benda alam",
+    "Alusi": "Berbicara : Kata Kerja / Verba, karena menyatakan kegiatan berbicara",
+    "Ambar": "Kolam air : Kata Benda / Nomina, karena menyatakan tempat",
+    "Among": "Ayah/bapak : Kata benda (nomina) karena menunjukkan orang",
+    "anakkon": "anakku : Kata benda (nomina) karena menamai seseorang (anak)",
+    "Andung": "ratapan/tangisan : Kata benda (nomina) karena menamai hasil perbuatan (rapatan)",
+    "Anggi": "Adik : Kata Benda / Nomina, karena menyatakan orang",
+    "Angkang": "Kakak : Kata Benda / Nomina, karena menyatakan orang",
+    "Arar / Alar": "Galah : Kata Benda / Nomina, karena menyatakan alat",
+    "Ari": "Hari : Kata Benda / Nomina, karena menunjukkan waktu",
+    "Asa": "Supaya / agar : Kata Penghubung / Konjungsi, karena menyatakan tujuan",
+    "Asar": "Sarang : Kata Benda / Nomina, karena menyatakan tempat",
+    "Asing": "Lain / beda : Kata Sifat / Adjektiva, karena menyatakan perbedaan",
+    "Ate": "hati : Kata benda, karena menamai bagian tubuh /perasaan",
+    "Attong": "Benar / betul : Kata Sifat / Adjektiva, karena menyatakan keadaan atau kebenaran",
+    "Baba": "Mulut : Kata Benda / Nomina, karena menyatakan bagian tubuh",
+    "Bagak": "Cantik : Kata Sifat / Adjektiva, karena menyatakan sifat fisik",
+    "Bahen": "Membuat : Kata Kerja / Verba, karena menyatakan tindakan",
+    "Baskom": "Baskom : Kata Benda / Nomina, karena menyatakan benda",
+    "Battal": "Bantal : Kata Benda / Nomina, karena menyatakan benda",
+    "Bege": "Dengar / mendengarkan : Kata Kerja / Verba, karena menyatakan aktivitas indra pendengaran",
+    "Bereng": "Lihat : Kata Kerja / Verba, karena menyatakan tindakan melihat",
+    "Betta": "Ayo : Kata Seru / Interjeksi, karena digunakan sebagai ajakan",
+    "Biang": "Anjing : Kata Benda / Nomina, karena menyatakan nama hewan",
+    "Birong": "Hitam : Kata Sifat / Adjektiva, karena menyatakan warna",
+    "Boasa": "Mengapa : Kata Tanya / Interogativa, karena digunakan untuk menanyakan sebab",
+    "Bodat": "Monyet : Kata Benda / Nomina, karena menyatakan nama hewan",
+    "Boha": "Bagaimana : Kata Tanya / Interogativa, bukan kata benda, kerja, atau sifat",
+    "Bohi": "Wajah : Kata Benda / Nomina, karena menyatakan bagian tubuh",
+    "Bolak": "Luas / lebar : Kata Sifat / Adjektiva, karena menyatakan ukuran",
+    "Bondar / Boddar": "Kali (sungai kecil) : Kata Benda / Nomina, karena menyatakan tempat alam",
+    "Boras": "Beras : Kata Benda / Nomina, karena menyatakan benda",
+    "Borning": "Malam : Kata Benda / Nomina, karena menyatakan waktu",
+    "Boru": "Perempuan : Kata Benda / Nomina, karena menyatakan jenis kelamin/orang",
+    "Botik": "Pepaya : Kata Benda / Nomina, karena menyatakan buah",
+    "Bottar": "Putih : Kata Sifat / Adjektiva, karena menyatakan warna",
+    "Bou": "Saudara perempuan bapak : Kata Benda / Nomina, karena menyatakan hubungan kekerabatan",
+    "Bulung": "Daun : Kata Benda / Nomina, karena menyatakan bagian tumbuhan",
+    "Burju": "Baik : Kata Sifat / Adjektiva, karena menyatakan sifat atau keadaan",
+    "Butet": "Anak perempuan : Kata Benda / Nomina, karena menyatakan orang",
+    "Dage": "keterangan : Kata Keterangan / Adverbia, karena menambahkan keterangan",
+    "Dainang": "Ibu : Kata Benda / Nomina, karena menyatakan orang",
+    "Dalanan": "Jalan : Kata Benda / Nomina, karena menyatakan tempat atau sarana lewat",
+    "Dalihan": "Tungku : Kata Benda / Nomina, karena menyatakan benda",
+    "Dame": "Damai : Kata Sifat / Adjektiva, karena menyatakan keadaan",
+    "Daong": "jangan : Kata Kerja / Verba, karena menyatakan aktivitas indra",
+    "Dapot": "Dapat / memperoleh : Kata Kerja / Verba, karena menyatakan tindakan memperoleh",
+    "Deba": "Sebelah / sisi : Kata Benda / Nomina, karena menyatakan bagian atau sisi",
+    "Debata": "Tuhan : Kata Benda / Nomina, karena menyatakan nama Tuhan",
+    "Denggan": "Baik : Kata Sifat / Adjektiva, karena menyatakan sifat atau keadaan",
+    "Didia": "Di mana : Kata Tanya / Interogativa, bukan nomina atau verba",
+    "Disi": "Di situ : Kata Keterangan / Adverbia, karena menyatakan tempat",
+    "Dohot": "Dengan / dan : Kata Penghubung / Konjungsi, bukan nomina atau verba",
+    "Dolok": "Gunung / bukit : Kata Benda / Nomina, karena menyatakan tempat alam",
+    "Domu": "Berkumpul / rapat : Kata Kerja / Verba, karena menyatakan tindakan berkumpul",
+    "Dongan": "Teman : Kata Benda / Nomina, karena menyatakan orang",
+    "Dungkon": "setelah : Kata Kerja / Verba, karena menyatakan posisi atau perbuatan",
+    "Eda": "Kakak ipar : Kata Benda / Nomina, karena menyatakan hubungan kekerabatan",
+    "Eme": "Padi : Kata Benda / Nomina, karena menyatakan tumbuhan atau bahan pangan",
+    "Etong": "Hitung : Kata Kerja / Verba, karena menyatakan tindakan menghitung",
+    "Habang": "Terbang : Kata Kerja / Verba, karena menyatakan gerakan",
+    "Habur": "Cepat : Kata Sifat / Adjektiva, karena menyatakan keadaan atau cara melakukan suatu perbuatan",
+    "Hagogoon": "Kekuatan : Kata Benda Abstrak / Nomina, karena menyatakan konsep",
+    "Halak": "Orang : Kata Benda / Nomina, karena menyatakan manusia",
+    "Hangar / Hingar": "Kelaparan / kurang pangan : Kata Sifat / Adjektiva, karena menyatakan keadaan",
+    "Hansar": "Mencret / diare : Kata Kerja / Verba, karena menyatakan proses atau keadaan tubuh",
+    "Harotas": "Kertas : Kata Benda / Nomina, karena menyatakan benda",
+    "Haruar / Haluar": "Keluar : Kata Kerja / Verba, karena menyatakan perbuatan berpindah dari dalam ke luar",
+    "Hata": "Kata / bahasa / perkataan : Kata Benda / Nomina, karena menyatakan sistem bahasa",
+    "Hauma": "Sawah : Kata Benda / Nomina, karena menyatakan tempat atau lahan",
+    "Hekkel": "Tertawa : Kata Kerja / Verba, karena menyatakan tindakan",
+    "Hepeng": "Uang : Kata Benda / Nomina, karena menyatakan benda",
+    "Hodar": "Jelek kelakuan : Kata Sifat / Adjektiva, karena menggambarkan sifat atau perilaku seseorang",
+    "Holit": "Pelit, kikir : Kata Sifat / Adjektiva, karena menyatakan watak atau sifat",
+    "Holong": "Cinta, kasih : Kata Benda Abstrak / Nomina, karena menyatakan perasaan",
+    "Holsoan": "Mengeluh : Kata Kerja / Verba, karena menyatakan tindakan menyatakan rasa",
+    "Hombar": "Tetangga / orang terdekat : Kata Benda / Nomina, karena menyatakan orang",
+    "Horas": "Selamat : Kata Benda / Nomina, digunakan sebagai ungkapan salam atau doa",
+    "Horung": "Kalung : Kata Benda / Nomina, karena menyatakan benda",
+    "Huar": "Gali tanah : Kata Kerja / Verba, karena menyatakan tindakan menggali",
+    "Hubil": "Menguliti : Kata Kerja / Verba, karena menyatakan tindakan",
+    "Hudali": "Pacul / cangkul : Kata Benda / Nomina, karena menyatakan alat",
+    "Hudon": "Periuk : Kata Benda / Nomina, karena menyatakan benda",
+    "Husap": "Sapu : Kata Benda / Nomina, karena menyatakan alat",
+    "Huta": "Kampung / desa : Kata Benda / Nomina, karena menyatakan tempat",
+    "Jabu": "Rumah : Kata Benda / Nomina, karena menyatakan tempat tinggal",
+    "Jagal": "Daging : Kata Benda / Nomina, karena menyatakan bahan makanan",
+    "Jambar": "Hak / penghormatan : Kata Benda / Nomina, karena menyatakan konsep sosial atau adat",
+    "Jamita": "Khotbah / ceramah : Kata Benda / Nomina, karena menyatakan bentuk tuturan atau kegiatan resmi",
+    "Jingar": "Galak : Kata Sifat / Adjektiva, karena menyatakan sifat atau sikap",
+    "Jolma": "Manusia : Kata Benda / Nomina, karena menyatakan orang",
+    "Jonok": "Dekat : Kata Sifat / Adjektiva, karena menyatakan jarak atau keadaan",
+    "Jora": "menyerah : Kata kerja/verba, karena menyatakan tindakan",
+    "Jotjot": "Sering / kerap : Kata Keterangan / Adverbia, karena menerangkan frekuensi suatu perbuatan",
+    "Jugul": "Nakal / bandel : Kata Sifat / Adjektiva, karena menyatakan sifat atau perilaku",
+    "Saba": "Sawah : Kata Benda / Nomina, karena menyatakan tempat/lahan",
+    "Sabur": "Tabur : Kata Kerja / Verba, karena menyatakan tindakan menaburkan",
+    "Sada": "Satu : Kata Bilangan / Numeralia, bukan nomina atau verba",
+    "Sadalan": "Jalan : Kata Benda / Nomina, karena menyatakan tempat atau sarana lewat",
+    "Sadeba": "Sebelah : Kata Keterangan / Adverbia, karena menyatakan posisi",
+    "Sadia": "Sedia / siap : Kata Sifat / Adjektiva, karena menyatakan keadaan kesiapan",
+    "Sadihari": "Sehari : Kata Benda / Nomina, karena menyatakan satuan waktu",
+    "Sae": "selesai : Kata Kerja / Verba, karena menyatakan selesai",
+    "Sahat": "Sampai : Kata Kerja / Verba, karena menyatakan perbuatan mencapai tujuan",
+    "Sahit": "Sakit : Kata Sifat / Adjektiva, karena menyatakan keadaan tubuh",
+    "Sakkap": "rencana : Kata Kerja / Verba, karena menyatakan tindakan merencanakan",
+    "Salpu": "Lupa : Kata Kerja / Verba, karena menyatakan keadaan atau proses mental",
+    "Sega": "rusak : Kata Benda / Nomina, karena menyatakan nama benda",
+    "Sian": "Dari : Kata Depan / Preposisi, bukan nomina atau verba",
+    "Sipangido": "Permintaan : Kata Benda / Nomina, karena menyatakan hasil perbuatan meminta",
+    "Sisilon": "kuku : Kata Benda / Nomina, karena menyatakan sesuatu benda kuku",
+    "Somba": "Sembah / hormat : Kata Kerja / Verba, karena menyatakan tindakan menghormati",
+    "Songon": "Seperti : Kata Penghubung / Konjungsi, bukan nomina atau verba",
+    "Sotung": "jangan : Kata Kerja / Verba, karena menyatakan tindakan jangan",
+    "Sude": "Semua : Kata Ganti Tak Tentu / Pronomina, bukan nomina atau verba",
+    "Tano": "Tanah : Kata Benda / Nomina, karena menyatakan benda alam",
+    "Tarhirim": "Terkirim : Kata Kerja / Verba, karena menyatakan suatu peristiwa atau tindakan",
+    "Tarombo": "Silsilah / garis keturunan : Kata Benda / Nomina, karena menyatakan hubungan keluarga",
+    "Tarpaima": "Diterima : Kata Kerja / Verba, karena menyatakan hasil suatu tindakan",
+    "Tarsunggul": "Terkenal / tersohor : Kata Sifat / Adjektiva, karena menyatakan keadaan atau sifat",
+    "Tiop": "Tiup : Kata Kerja / Verba, karena menyatakan tindakan meniup",
+    "Togu": "Tahan / kuat : Kata Sifat / Adjektiva, karena menyatakan keadaan atau kemampuan",
+    "toho": "Tunjuk / menunjukkan : Kata Kerja / Verba, karena menyatakan tindakan",
+    "Tolu": "Tiga : Kata Bilangan / Numeralia, bukan nomina atau verba",
+    "Tondi": "Roh / jiwa : Kata Benda / Nomina, karena menyatakan sesuatu yang bersifat abstrak",
+    "Torop": "Masuk ramai-ramai / berkerumun* : Kata Kerja / Verba, karena menyatakan perbuatan",
+    "Tuak": "Tuak (minuman tradisional) : Kata Benda / Nomina, karena menyatakan benda/minuman",
+    "Tulang": "Paman (saudara laki-laki ibu) : Kata Benda / Nomina, karena menyatakan hubungan kekerabatan/orang",
+    "Tultul": "Tetes / menetes : Kata Kerja / Verba, karena menyatakan proses atau perbuatan",
+    "Tupa": "Sama / serupa : Kata Sifat / Adjektiva, karena menyatakan persamaan",
+    "Uban": "Rambut putih : Kata Benda / Nomina, karena menyatakan bagian tubuh",
+    "Ucok": "Nama panggilan laki-laki : Kata Benda / Nomina, karena menyatakan nama orang",
+    "Udan": "Hujan : Kata Benda / Nomina, karena menyatakan peristiwa alam",
+    "Ulaon": "Pekerjaan / kegiatan : Kata Benda / Nomina, karena menyatakan aktivitas atau perbuatan",
+    "Uli": "cantik : Kata Kerja / adjktive , karena menyatakan kecantikan atau perasaan",
+    "Ulok": "Ular : Kata Benda / Nomina, karena menyatakan nama hewan",
+    "Ulos": "Kain adat Batak : Kata Benda / Nomina, karena menyatakan benda budaya",
+    "Uma": "Sawah / ladang : Kata Benda / Nomina, karena menyatakan tempat/lahan",
+    "Umpama": "Perumpamaan misalnya : Kata Penghubung Konjungsi, bukan nomina atau verba",
+    "Umpasa": "Pantun / syair adat : Kata Benda / Nomina, karena menyatakan bentuk sastra lisan",
+    "Unang": "Jangan : Kata Larangan / Partikel, bukan nomina atau verba",
+    "Urat": "Otot / urat : Kata Benda / Nomina, karena menyatakan bagian tubuh"
+
+  }
+};
+  </script>
+
+  <script>
+let currentLang = '';
+
+// === NAVIGASI ===
+function showDictionary(lang) {
+  currentLang = lang;
+  document.getElementById('languageSelection').style.display = 'none';
+  document.getElementById(`dictionary${capitalize(lang)}`).style.display = 'block';
+
+  document.getElementById(`search${capitalize(lang)}`).value = '';
+  document.getElementById(`searchResult${capitalize(lang)}`).innerHTML = '';
+
+  renderAlphabetFilter(lang);
+  setTimeout(() => filterWords(lang, ''), 0);
+}
+
+function goBack() {
+  document.querySelectorAll('.dictionary-page').forEach(el => el.style.display = 'none');
+  document.getElementById('languageSelection').style.display = 'block';
+}
+
+// === PENCARIAN ===
+function searchWord(lang) {
+  const query = document.getElementById(`search${capitalize(lang)}`).value.trim().toLowerCase();
+  const resultBox = document.getElementById(`searchResult${capitalize(lang)}`);
+  const dict = dictionaries[lang];
+
+  if (query === '') {
+    resultBox.innerHTML = '';
+    filterWords(lang, '');
+    return;
+  }
+
+  const matches = Object.entries(dict).filter(([batak, full]) =>
+    batak.toLowerCase().includes(query) || full.toLowerCase().includes(query)
+  );
+
+  if (matches.length > 0) {
+    resultBox.innerHTML = matches.map(([batak, full]) => {
+      const [arti, jenis] = full.split(' : ');
+      return `
+        <div class="search-result">
+          <strong style="color:var(--batak-red);">${capitalizeFirst(batak)}</strong> → 
+          <strong>${capitalizeFirst(arti)}</strong>
+          <em style="color:#666; margin-left:8px; font-size:0.9em;">(${capitalizeFirst(jenis || '')})</em>
+        </div>
+      `;
+    }).join('');
+  } else {
+    resultBox.innerHTML = `<div class="search-result" style="background:#ffebee; border-left-color:#c62828;">
+      Kata "<strong>${query}</strong>" tidak ditemukan.
+    </div>`;
+  }
+
+  document.getElementById(`wordList${capitalize(lang)}`).innerHTML = '';
+  document.querySelectorAll(`#alpha${capitalize(lang)} .alpha-btn`).forEach(b => b.classList.remove('active'));
+}
+
+// === RENDER CARD ===
+function renderWordCard(batak, full) {
+  const [arti, jenis] = full.split(' : ');
+  return `
+    <div class="word-card">
+      <div class="word-batak">${capitalizeFirst(batak)}</div>
+      <div class="word-meaning">→ ${capitalizeFirst(arti)}</div>
+      <div class="word-type">(${capitalizeFirst(jenis || '—')})</div>
+    </div>
+  `;
+}
+
+// === FILTER & RENDER ===
+function filterWords(lang, letter) {
+  const wordList = document.getElementById(`wordList${capitalize(lang)}`);
+  if (!wordList) return;
+
+  const dict = dictionaries[lang];
+  const words = Object.entries(dict);
+
+  const searchInput = document.getElementById(`search${capitalize(lang)}`).value.trim();
+  if (searchInput !== '') return;
+
+  let filtered = letter === ''
+    ? words
+    : words.filter(([batak]) => batak.toUpperCase().startsWith(letter));
+
+  filtered.sort((a, b) => a[0].localeCompare(b[0]));
+
+  document.querySelectorAll(`#alpha${capitalize(lang)} .alpha-btn`).forEach(btn => {
+    btn.classList.toggle('active',
+      (letter === '' && btn.textContent === 'SEMUA') ||
+      btn.textContent === letter
+    );
+  });
+
+  if (filtered.length === 0) {
+    wordList.innerHTML = `<div class="no-words">Tidak ada kata untuk huruf <strong>${letter || 'SEMUA'}</strong>.</div>`;
+    return;
+  }
+
+  wordList.innerHTML = filtered.map(([batak, full]) => renderWordCard(batak, full)).join('');
+}
+
+// === RENDER FILTER HURUF ===
+function renderAlphabetFilter(lang) {
+  const container = document.getElementById(`alpha${capitalize(lang)}`);
+  container.innerHTML = '';
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'alpha-btn active';
+  allBtn.textContent = 'SEMUA';
+  allBtn.onclick = () => {
+    document.getElementById(`search${capitalize(lang)}`).value = '';
+    document.getElementById(`searchResult${capitalize(lang)}`).innerHTML = '';
+    filterWords(lang, '');
+  };
+  container.appendChild(allBtn);
+
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  letters.forEach(letter => {
+    if (Object.keys(dictionaries[lang]).some(batak => batak.toUpperCase().startsWith(letter))) {
+      const btn = document.createElement('button');
+      btn.className = 'alpha-btn';
+      btn.textContent = letter;
+      btn.onclick = () => filterWords(lang, letter);
+      container.appendChild(btn);
+    }
+  });
+}
+
+// === UTILS ===
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function capitalizeFirst(str) {
+  if (!str) return '';
+  return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+  </script>
+</body>
+</html>
